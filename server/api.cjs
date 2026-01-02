@@ -22,6 +22,14 @@ async function connectDB() {
     await client.connect();
     const db = client.db("taochow");
     recipesCollection = db.collection("recipes");
+    // Ensure we have a fast, unique index on the custom `id` field
+    try {
+      await recipesCollection.createIndex({ id: 1 }, { unique: true });
+      console.log('Ensured unique index on recipes.id');
+    } catch (idxErr) {
+      console.warn('Could not create index on recipes.id:', idxErr.message || idxErr);
+    }
+
     console.log("Connected to MongoDB Atlas");
   } catch (error) {
     console.error("MongoDB connection error:", error);
@@ -45,12 +53,7 @@ app.get("/api/recipes", async (req, res) => {
 // GET a single recipe by ID
 app.get("/api/recipes/:id", async (req, res) => {
   try {
-    const recipe = await recipesCollection.findOne({
-      $or: [
-        { _id: new ObjectId(req.params.id) },
-        { id: req.params.id }
-      ]
-    });
+    const recipe = await recipesCollection.findOne({ id: req.params.id });
 
     if (!recipe) {
       return res.status(404).json({ error: "Recipe not found" });
@@ -112,12 +115,7 @@ app.put("/api/recipes/:id", async (req, res) => {
     };
 
     const result = await recipesCollection.findOneAndUpdate(
-      {
-        $or: [
-          { _id: new ObjectId(req.params.id) },
-          { id: req.params.id }
-        ]
-      },
+      { id: req.params.id },
       { $set: updateData },
       { returnDocument: "after" }
     );
@@ -136,12 +134,7 @@ app.put("/api/recipes/:id", async (req, res) => {
 // DELETE a recipe
 app.delete("/api/recipes/:id", async (req, res) => {
   try {
-    const result = await recipesCollection.deleteOne({
-      $or: [
-        { _id: new ObjectId(req.params.id) },
-        { id: req.params.id }
-      ]
-    });
+    const result = await recipesCollection.deleteOne({ id: req.params.id });
 
     if (result.deletedCount === 0) {
       return res.status(404).json({ error: "Recipe not found" });
@@ -173,12 +166,7 @@ app.post("/api/recipes/:id/iterations", async (req, res) => {
     };
 
     const result = await recipesCollection.findOneAndUpdate(
-      {
-        $or: [
-          { _id: new ObjectId(req.params.id) },
-          { id: req.params.id }
-        ]
-      },
+      { id: req.params.id },
       { $push: { iterations: newIteration } },
       { returnDocument: "after" }
     );
@@ -198,12 +186,7 @@ app.post("/api/recipes/:id/iterations", async (req, res) => {
 app.delete("/api/recipes/:id/iterations/:iterationId", async (req, res) => {
   try {
     const result = await recipesCollection.findOneAndUpdate(
-      {
-        $or: [
-          { _id: new ObjectId(req.params.id) },
-          { id: req.params.id }
-        ]
-      },
+      { id: req.params.id },
       { $pull: { iterations: { id: req.params.iterationId } } },
       { returnDocument: "after" }
     );
