@@ -1,0 +1,138 @@
+.iteration-table-container {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+}
+
+.iteration-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-base);
+}
+
+.iteration-table thead {
+  background-color: var(--neutral-100);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.iteration-table th {
+  padding: var(--space-4);
+  text-align: left;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.iteration-table td {
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  vertical-align: top;
+}
+
+.iteration-table tbody tr:hover {
+  background-color: var(--neutral-50);
+}
+
+.iteration-image-preview {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: transform var(--transition-base);
+}
+
+.iteration-image-preview:hover {
+  transform: scale(1.05);
+}
+
+.iteration-image-preview img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  display: block;
+}
+
+.iteration-no-image {
+  color: var(--color-text-disabled);
+}
+
+.iteration-empty {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--color-text-secondary);
+  background-color: var(--neutral-50);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-target-min);
+  height: var(--tap-target-min);
+  padding: var(--space-2);
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.btn-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.btn-icon-danger {
+  color: #DC2626;
+}
+
+.btn-icon-danger:hover {
+  background-color: #FEE2E2;
+  color: #991B1B;
+}
+
+/* Mobile responsive table */
+@media (max-width: 768px) {
+  .iteration-table thead {
+    display: none;
+  }
+
+  .iteration-table,
+  .iteration-table tbody,
+  .iteration-table tr,
+  .iteration-table td {
+    display: block;
+  }
+
+  .iteration-table tr {
+    margin-bottom: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .iteration-table td {
+    border-top: none;
+    padding: var(--space-3) var(--space-4);
+    position: relative;
+    padding-left: 40%;
+    text-align: right;
+  }
+
+  .iteration-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: var(--space-4);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+    text-align: left;
+  }
+
+  .iteration-table td:first-child {
+    background-color: var(--neutral-100);
+  }
+}

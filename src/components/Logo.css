@@ -1,0 +1,20 @@
+.logo {
+  display: inline-block;
+}
+
+.logo-image {
+  display: block;
+  height: auto;
+}
+
+.logo-small .logo-image {
+  height: 32px;
+}
+
+.logo-medium .logo-image {
+  height: 48px;
+}
+
+.logo-large .logo-image {
+  height: 64px;
+}

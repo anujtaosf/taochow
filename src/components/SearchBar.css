@@ -1,0 +1,65 @@
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto var(--space-8);
+}
+
+.search-bar-icon {
+  position: absolute;
+  left: var(--space-4);
+  width: 24px;
+  height: 24px;
+  color: var(--color-text-secondary);
+  pointer-events: none;
+}
+
+.search-bar-input {
+  width: 100%;
+  padding: var(--space-4) var(--space-12);
+  padding-left: var(--space-12);
+  font-size: var(--font-size-lg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface);
+  transition: all var(--transition-base);
+}
+
+.search-bar-input:focus {
+  outline: none;
+  border-color: var(--brand-700);
+  box-shadow: var(--focus-ring);
+}
+
+.search-bar-input::placeholder {
+  color: var(--color-text-disabled);
+}
+
+.search-bar-clear {
+  position: absolute;
+  right: var(--space-4);
+  width: var(--tap-target-min);
+  height: var(--tap-target-min);
+  padding: var(--space-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  transition: all var(--transition-base);
+}
+
+.search-bar-clear:hover {
+  background-color: var(--neutral-100);
+  color: var(--color-text-primary);
+}
+
+.search-bar-clear svg {
+  width: 20px;
+  height: 20px;
+}
