@@ -20,8 +20,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node server/api.cjs",
     "build": "react-scripts build",
+    "postinstall": "npm run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "server": "node server/api.cjs",
