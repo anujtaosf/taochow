@@ -5,7 +5,7 @@ require("dotenv").config({ path: "./config.env" });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const HOST = process.env.HOST || 'taochow-api.onrender.com';
+const HOST = process.env.HOST || 'taochow.onrender.com';
 
 // Middleware
 app.use(cors());
