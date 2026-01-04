@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRecipes } from '../app/RecipeContext';
-import { recipeStore } from '../data/store';
 import IterationTable from './IterationTable';
 import IterationFormModal from './IterationFormModal';
 import RecipeFormModal from './RecipeFormModal';
@@ -19,17 +18,18 @@ function RecipeView({ onEditRecipe }) {
   const loadRecipe = useCallback(async () => {
     setLoading(true);
     try {
-      // Try localStorage first for fallback
-      const data = await recipeStore.get(id);
-      if (data) {
-        setRecipe(data);
-      } else {
-        alert('Recipe not found');
-        navigate('/');
+      const res = await fetch(`/api/recipes/${id}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Recipe not found');
       }
+
+      setRecipe(data);
     } catch (error) {
       console.error('Error loading recipe:', error);
-      alert('Error loading recipe');
+      alert(error.message);
+      navigate('/');
     } finally {
       setLoading(false);
     }
