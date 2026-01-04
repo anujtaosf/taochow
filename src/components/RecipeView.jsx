@@ -4,16 +4,18 @@ import { useRecipes } from '../app/RecipeContext';
 import IterationTable from './IterationTable';
 import IterationFormModal from './IterationFormModal';
 import RecipeFormModal from './RecipeFormModal';
+import ImageModal from './ImageModal';
 import './RecipeView.css';
 
 function RecipeView({ onEditRecipe }) {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { updateRecipe, addIteration, deleteIteration } = useRecipes();
+  const { updateRecipe, addIteration, deleteIteration, deleteRecipe } = useRecipes();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showIterationModal, setShowIterationModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const loadRecipe = useCallback(async () => {
     setLoading(true);
@@ -71,6 +73,22 @@ function RecipeView({ onEditRecipe }) {
     }
   };
 
+  const handleDeleteRecipe = async () => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${recipe.title}"? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteRecipe(id);
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting recipe:', error);
+      alert('Error deleting recipe');
+    }
+  };
+
   if (loading) {
     return (
       <div className="recipe-view-loading">
@@ -96,19 +114,40 @@ function RecipeView({ onEditRecipe }) {
         <div className="recipe-view-header">
           <div className="recipe-view-title-row">
             <h1 className="recipe-view-title">{recipe.title}</h1>
-            <button
-              onClick={() => setShowEditModal(true)}
-              className="btn btn-secondary"
-            >
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '20px', height: '20px' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              Edit Recipe
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button
+                onClick={() => setShowEditModal(true)}
+                className="btn btn-secondary"
+              >
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit Recipe
+              </button>
+              <button
+                onClick={handleDeleteRecipe}
+                className="btn btn-danger"
+                style={{ backgroundColor: '#dc2626', color: 'white' }}
+              >
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ width: '20px', height: '20px' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Delete
+              </button>
+            </div>
           </div>
-          {recipe.image && (
-            <div className="recipe-view-image-container">
-              <img src={recipe.image} alt={recipe.title} className="recipe-view-image" />
+          {((recipe.images && recipe.images.length > 0) || recipe.image) && (
+            <div className="recipe-view-images-container">
+              {(recipe.images && recipe.images.length > 0 ? recipe.images : [recipe.image]).map((image, index) => (
+                <div
+                  key={index}
+                  className="recipe-view-image-wrapper"
+                  onClick={() => setSelectedImage({ image, alt: recipe.title })}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <img src={image} alt={`${recipe.title} ${index + 1}`} className="recipe-view-image" />
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -183,6 +222,13 @@ function RecipeView({ onEditRecipe }) {
         onClose={() => setShowEditModal(false)}
         onSave={handleEditRecipe}
         editRecipe={recipe}
+      />
+
+      <ImageModal
+        image={selectedImage?.image}
+        alt={selectedImage?.alt}
+        isOpen={!!selectedImage}
+        onClose={() => setSelectedImage(null)}
       />
     </div>
   );

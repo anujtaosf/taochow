@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ImageModal from './ImageModal';
 import './IterationTable.css';
 
 function IterationTable({ iterations, onDelete }) {
+  const [selectedImage, setSelectedImage] = useState(null);
+
   if (iterations.length === 0) {
     return (
       <div className="iteration-empty">
@@ -17,6 +20,10 @@ function IterationTable({ iterations, onDelete }) {
     if (confirm && onDelete) {
       onDelete(iteration.id);
     }
+  };
+
+  const handleImageClick = (image, chef, date) => {
+    setSelectedImage({ image, alt: `${chef}'s iteration from ${new Date(date).toLocaleDateString()}` });
   };
 
   return (
@@ -43,7 +50,7 @@ function IterationTable({ iterations, onDelete }) {
                 {iteration.image ? (
                   <button
                     className="iteration-image-preview"
-                    onClick={() => window.open(iteration.image, '_blank')}
+                    onClick={() => handleImageClick(iteration.image, iteration.chef, iteration.date)}
                   >
                     <img src={iteration.image} alt="Iteration" />
                   </button>
@@ -72,6 +79,13 @@ function IterationTable({ iterations, onDelete }) {
           ))}
         </tbody>
       </table>
+
+      <ImageModal
+        image={selectedImage?.image}
+        alt={selectedImage?.alt}
+        isOpen={!!selectedImage}
+        onClose={() => setSelectedImage(null)}
+      />
     </div>
   );
 }

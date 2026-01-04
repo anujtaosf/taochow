@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ImagePicker from './ImagePicker';
+import MultiImagePicker from './MultiImagePicker';
 import './RecipeFormModal.css';
 
 function RecipeFormModal({ isOpen, onClose, onSave, editRecipe = null }) {
@@ -7,7 +7,7 @@ function RecipeFormModal({ isOpen, onClose, onSave, editRecipe = null }) {
 
   const [formData, setFormData] = useState({
     title: '',
-    image: null,
+    images: [],
     ingredients: '',
     instructions: [],
     chefNotes: ''
@@ -20,9 +20,17 @@ function RecipeFormModal({ isOpen, onClose, onSave, editRecipe = null }) {
     if (isOpen) {
       if (editRecipe) {
         // Pre-populate form with existing recipe data
+        // Support both old 'image' field and new 'images' array
+        let recipeImages = [];
+        if (editRecipe.images && Array.isArray(editRecipe.images)) {
+          recipeImages = editRecipe.images;
+        } else if (editRecipe.image) {
+          recipeImages = [editRecipe.image];
+        }
+
         setFormData({
           title: editRecipe.title,
-          image: editRecipe.image || null,
+          images: recipeImages,
           ingredients: editRecipe.ingredients.join('\n'),
           instructions: editRecipe.instructions || [],
           chefNotes: editRecipe.chefNotes || ''
@@ -36,6 +44,7 @@ function RecipeFormModal({ isOpen, onClose, onSave, editRecipe = null }) {
             const parsed = JSON.parse(draft);
             setFormData({
               ...parsed,
+              images: parsed.images || [],
               instructions: Array.isArray(parsed.instructions) ? parsed.instructions : parsed.instructions ? parsed.instructions.split('\n') : []
             });
           } catch (e) {
@@ -110,7 +119,7 @@ function RecipeFormModal({ isOpen, onClose, onSave, editRecipe = null }) {
 
     const recipeData = {
       title: formData.title.trim(),
-      image: formData.image,
+      images: formData.images,
       ingredients: ingredients.length > 0 ? ingredients : [],
       instructions: instructions.length > 0 ? instructions : [],
       chefNotes: formData.chefNotes.trim()
@@ -129,7 +138,7 @@ function RecipeFormModal({ isOpen, onClose, onSave, editRecipe = null }) {
     }
     setFormData({
       title: '',
-      image: null,
+      images: [],
       ingredients: '',
       instructions: [],
       chefNotes: ''
@@ -178,11 +187,11 @@ function RecipeFormModal({ isOpen, onClose, onSave, editRecipe = null }) {
             </div>
 
             <div className="form-group">
-              <label className="label">Recipe Photo (optional)</label>
-              <ImagePicker
-                value={formData.image}
-                onChange={(value) => handleChange('image', value)}
-                label="Add Recipe Photo"
+              <label className="label">Recipe Photos (optional)</label>
+              <MultiImagePicker
+                value={formData.images}
+                onChange={(value) => handleChange('images', value)}
+                label="Add Photos"
               />
             </div>
 

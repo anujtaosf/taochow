@@ -69,17 +69,25 @@ app.get("/api/recipes/:id", async (req, res) => {
 // CREATE a new recipe
 app.post("/api/recipes", async (req, res) => {
   try {
-    const { title, image, ingredients, instructions, chefNotes } = req.body;
+    const { title, image, images, ingredients, instructions, chefNotes } = req.body;
 
     // Validate required fields
     if (!title || !Array.isArray(ingredients) || !Array.isArray(instructions)) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    // Support both old 'image' field and new 'images' array
+    let recipeImages = [];
+    if (images && Array.isArray(images)) {
+      recipeImages = images;
+    } else if (image) {
+      recipeImages = [image];
+    }
+
     const newRecipe = {
       id: Date.now().toString(36) + Math.random().toString(36).substr(2),
       title,
-      image: image || null,
+      images: recipeImages,
       ingredients,
       instructions,
       chefNotes: chefNotes || "",
@@ -98,16 +106,24 @@ app.post("/api/recipes", async (req, res) => {
 // UPDATE an existing recipe
 app.put("/api/recipes/:id", async (req, res) => {
   try {
-    const { title, image, ingredients, instructions, chefNotes } = req.body;
+    const { title, image, images, ingredients, instructions, chefNotes } = req.body;
 
     // Validate required fields
     if (!title || !Array.isArray(ingredients) || !Array.isArray(instructions)) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    // Support both old 'image' field and new 'images' array
+    let recipeImages = [];
+    if (images && Array.isArray(images)) {
+      recipeImages = images;
+    } else if (image) {
+      recipeImages = [image];
+    }
+
     const updateData = {
       title,
-      image: image || null,
+      images: recipeImages,
       ingredients,
       instructions,
       chefNotes: chefNotes || "",

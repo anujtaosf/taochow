@@ -58,18 +58,33 @@
   color: var(--color-text-primary);
 }
 
-.recipe-view-image-container {
+.recipe-view-images-container {
   width: 100%;
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
-  border-radius: var(--radius-xl);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-4);
+}
+
+.recipe-view-image-wrapper {
+  position: relative;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+.recipe-view-image-wrapper:hover {
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-2px);
 }
 
 .recipe-view-image {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 4/3;
   display: block;
 }
 

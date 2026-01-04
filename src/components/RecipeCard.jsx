@@ -10,11 +10,16 @@ function RecipeCard({ recipe, onEditRecipe }) {
     }
   };
 
+  // Get the first image from either images array or legacy image field
+  const thumbnailImage = recipe.images && recipe.images.length > 0
+    ? recipe.images[0]
+    : recipe.image || null;
+
   return (
     <Link to={`/recipe/${recipe.id || recipe._id}`} className="recipe-card">
       <div className="recipe-card-image-container">
-        {recipe.image ? (
-          <img src={recipe.image} alt={recipe.title} className="recipe-card-image" />
+        {thumbnailImage ? (
+          <img src={thumbnailImage} alt={recipe.title} className="recipe-card-image" />
         ) : (
           <div className="recipe-card-placeholder">
             <svg
