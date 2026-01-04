@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { recipeStore } from '../data/store';
 
-const API_URL = process.env.REACT_APP_API_URL || (typeof window !== 'undefined' ? `${window.location.origin}/api` : 'http://localhost:5000/api');
-
 const RecipeContext = createContext(null);
 
 export function RecipeProvider({ children }) {
@@ -19,7 +17,7 @@ export function RecipeProvider({ children }) {
     try {
       // Try to load from API first
       try {
-        const response = await fetch(`${API_URL}/recipes`);
+        const response = await fetch('/api/recipes');
         if (response.ok) {
           const data = await response.json();
           setRecipes(data);
@@ -44,7 +42,7 @@ export function RecipeProvider({ children }) {
   const createRecipe = async (recipeData) => {
     try {
       if (useAPI) {
-        const response = await fetch(`${API_URL}/recipes`, {
+        const response = await fetch('/api/recipes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(recipeData)
@@ -69,7 +67,7 @@ export function RecipeProvider({ children }) {
   const updateRecipe = async (recipeId, recipeData) => {
     try {
       if (useAPI) {
-        const response = await fetch(`${API_URL}/recipes/${recipeId}`, {
+        const response = await fetch(`/api/recipes/${recipeId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(recipeData)
@@ -96,7 +94,7 @@ export function RecipeProvider({ children }) {
   const deleteRecipe = async (recipeId) => {
     try {
       if (useAPI) {
-        const response = await fetch(`${API_URL}/recipes/${recipeId}`, {
+        const response = await fetch(`/api/recipes/${recipeId}`, {
           method: 'DELETE'
         });
 
@@ -118,7 +116,7 @@ export function RecipeProvider({ children }) {
   const addIteration = async (recipeId, iterationData) => {
     try {
       if (useAPI) {
-        const response = await fetch(`${API_URL}/recipes/${recipeId}/iterations`, {
+        const response = await fetch(`/api/recipes/${recipeId}/iterations`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(iterationData)
@@ -145,7 +143,7 @@ export function RecipeProvider({ children }) {
   const deleteIteration = async (recipeId, iterationId) => {
     try {
       if (useAPI) {
-        const response = await fetch(`${API_URL}/recipes/${recipeId}/iterations/${iterationId}`, {
+        const response = await fetch(`/api/recipes/${recipeId}/iterations/${iterationId}`, {
           method: 'DELETE'
         });
 
