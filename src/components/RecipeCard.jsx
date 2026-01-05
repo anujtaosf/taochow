@@ -15,8 +15,11 @@ function RecipeCard({ recipe, onEditRecipe }) {
     ? recipe.images[0]
     : recipe.image || null;
 
+  // Always use custom id field, fallback to _id only if necessary
+  const recipeId = recipe.id || recipe._id;
+
   return (
-    <Link to={`/recipe/${recipe.id || recipe._id}`} className="recipe-card">
+    <Link to={`/recipe/${recipeId}`} className="recipe-card">
       <div className="recipe-card-image-container">
         {thumbnailImage ? (
           <img src={thumbnailImage} alt={recipe.title} className="recipe-card-image" />

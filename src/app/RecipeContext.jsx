@@ -116,6 +116,7 @@ export function RecipeProvider({ children }) {
   const addIteration = async (recipeId, iterationData) => {
     try {
       if (useAPI) {
+        console.log('addIteration recipeId =', recipeId);
         const response = await fetch(`/api/recipes/${recipeId}/iterations`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -53,7 +53,16 @@ app.get("/api/recipes", async (req, res) => {
 // GET a single recipe by ID
 app.get("/api/recipes/:id", async (req, res) => {
   try {
-    const recipe = await recipesCollection.findOne({ id: req.params.id });
+    // Support both MongoDB _id and custom id field
+    const param = req.params.id;
+    let query;
+    if (/^[a-f\d]{24}$/i.test(param)) {
+      query = { _id: new ObjectId(param) };
+    } else {
+      query = { id: param };
+    }
+
+    const recipe = await recipesCollection.findOne(query);
 
     if (!recipe) {
       return res.status(404).json({ error: "Recipe not found" });
@@ -130,17 +139,26 @@ app.put("/api/recipes/:id", async (req, res) => {
       updatedAt: new Date().toISOString()
     };
 
+    // Support both MongoDB _id and custom id field
+    const param = req.params.id;
+    let query;
+    if (/^[a-f\d]{24}$/i.test(param)) {
+      query = { _id: new ObjectId(param) };
+    } else {
+      query = { id: param };
+    }
+
     const result = await recipesCollection.findOneAndUpdate(
-      { id: req.params.id },
+      query,
       { $set: updateData },
       { returnDocument: "after" }
     );
 
-    if (!result.value) {
+    if (!result) {
       return res.status(404).json({ error: "Recipe not found" });
     }
 
-    res.json(result.value);
+    res.json(result);
   } catch (error) {
     console.error("Error updating recipe:", error);
     res.status(500).json({ error: "Failed to update recipe" });
@@ -150,7 +168,16 @@ app.put("/api/recipes/:id", async (req, res) => {
 // DELETE a recipe
 app.delete("/api/recipes/:id", async (req, res) => {
   try {
-    const result = await recipesCollection.deleteOne({ id: req.params.id });
+    // Support both MongoDB _id and custom id field
+    const param = req.params.id;
+    let query;
+    if (/^[a-f\d]{24}$/i.test(param)) {
+      query = { _id: new ObjectId(param) };
+    } else {
+      query = { id: param };
+    }
+
+    const result = await recipesCollection.deleteOne(query);
 
     if (result.deletedCount === 0) {
       return res.status(404).json({ error: "Recipe not found" });
@@ -181,17 +208,26 @@ app.post("/api/recipes/:id/iterations", async (req, res) => {
       image: image || null
     };
 
+    // Support both MongoDB _id and custom id field
+    const param = req.params.id;
+    let query;
+    if (/^[a-f\d]{24}$/i.test(param)) {
+      query = { _id: new ObjectId(param) };
+    } else {
+      query = { id: param };
+    }
+
     const result = await recipesCollection.findOneAndUpdate(
-      { id: req.params.id },
+      query,
       { $push: { iterations: newIteration } },
       { returnDocument: "after" }
     );
 
-    if (!result.value) {
+    if (!result) {
       return res.status(404).json({ error: "Recipe not found" });
     }
 
-    res.json(result.value);
+    res.json(result);
   } catch (error) {
     console.error("Error adding iteration:", error);
     res.status(500).json({ error: "Failed to add iteration" });
@@ -201,17 +237,26 @@ app.post("/api/recipes/:id/iterations", async (req, res) => {
 // DELETE an iteration from a recipe
 app.delete("/api/recipes/:id/iterations/:iterationId", async (req, res) => {
   try {
+    // Support both MongoDB _id and custom id field
+    const param = req.params.id;
+    let query;
+    if (/^[a-f\d]{24}$/i.test(param)) {
+      query = { _id: new ObjectId(param) };
+    } else {
+      query = { id: param };
+    }
+
     const result = await recipesCollection.findOneAndUpdate(
-      { id: req.params.id },
+      query,
       { $pull: { iterations: { id: req.params.iterationId } } },
       { returnDocument: "after" }
     );
 
-    if (!result.value) {
+    if (!result) {
       return res.status(404).json({ error: "Recipe not found" });
     }
 
-    res.json(result.value);
+    res.json(result);
   } catch (error) {
     console.error("Error deleting iteration:", error);
     res.status(500).json({ error: "Failed to delete iteration" });
