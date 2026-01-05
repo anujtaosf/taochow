@@ -9,11 +9,9 @@ function RecipeFormModal({ isOpen, onClose, onSave, editRecipe = null }) {
     title: '',
     images: [],
     ingredients: '',
-    instructions: [],
+    instructions: '',
     chefNotes: ''
   });
-
-  const [currentStepInput, setCurrentStepInput] = useState('');
 
   // Load existing recipe data when editing or draft when creating
   useEffect(() => {
@@ -32,10 +30,9 @@ function RecipeFormModal({ isOpen, onClose, onSave, editRecipe = null }) {
           title: editRecipe.title,
           images: recipeImages,
           ingredients: editRecipe.ingredients.join('\n'),
-          instructions: editRecipe.instructions || [],
+          instructions: (editRecipe.instructions || []).join('\n'),
           chefNotes: editRecipe.chefNotes || ''
         });
-        setCurrentStepInput('');
       } else {
         // Load draft from localStorage when creating new recipe
         const draft = localStorage.getItem('draftRecipe');
@@ -45,13 +42,12 @@ function RecipeFormModal({ isOpen, onClose, onSave, editRecipe = null }) {
             setFormData({
               ...parsed,
               images: parsed.images || [],
-              instructions: Array.isArray(parsed.instructions) ? parsed.instructions : parsed.instructions ? parsed.instructions.split('\n') : []
+              instructions: Array.isArray(parsed.instructions) ? parsed.instructions.join('\n') : parsed.instructions || ''
             });
           } catch (e) {
             console.error('Error loading draft:', e);
           }
         }
-        setCurrentStepInput('');
       }
     }
   }, [isOpen, editRecipe]);
@@ -65,31 +61,6 @@ function RecipeFormModal({ isOpen, onClose, onSave, editRecipe = null }) {
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleAddStep = () => {
-    const trimmedStep = currentStepInput.trim();
-    if (trimmedStep) {
-      setFormData(prev => ({
-        ...prev,
-        instructions: [...prev.instructions, trimmedStep]
-      }));
-      setCurrentStepInput('');
-    }
-  };
-
-  const handleRemoveStep = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      instructions: prev.instructions.filter((_, i) => i !== index)
-    }));
-  };
-
-  const handleStepInputKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddStep();
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -107,7 +78,11 @@ function RecipeFormModal({ isOpen, onClose, onSave, editRecipe = null }) {
       .map(line => line.trim())
       .filter(line => line.length > 0);
 
-    const instructions = formData.instructions.filter(step => step.length > 0);
+    // Parse instructions
+    const instructions = formData.instructions
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
 
     // Confirm if ingredients or instructions are empty
     if (ingredients.length === 0 || instructions.length === 0) {
@@ -140,16 +115,15 @@ function RecipeFormModal({ isOpen, onClose, onSave, editRecipe = null }) {
       title: '',
       images: [],
       ingredients: '',
-      instructions: [],
+      instructions: '',
       chefNotes: ''
     });
-    setCurrentStepInput('');
 
     onClose();
   };
 
   const handleCancel = () => {
-    if (formData.title || formData.ingredients || formData.instructions.length > 0) {
+    if (formData.title || formData.ingredients || formData.instructions) {
       const proceed = window.confirm(
         'You have unsaved changes. Are you sure you want to close?'
       );
@@ -211,48 +185,32 @@ function RecipeFormModal({ isOpen, onClose, onSave, editRecipe = null }) {
             </div>
 
             <div className="form-group">
-              <label className="label">
+              <label htmlFor="instructions" className="label">
                 Instructions <span className="required">*</span>
               </label>
-              <div className="steps-container">
-                {formData.instructions.length > 0 && (
-                  <div className="steps-list">
-                    {formData.instructions.map((step, index) => (
-                      <div key={index} className="step-item">
-                        <span className="step-number">{index + 1}</span>
-                        <span className="step-text">{step}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveStep(index)}
-                          className="btn-remove-step"
-                          title="Remove step"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <div className="step-input-group">
-                  <span className="step-number">{formData.instructions.length + 1}</span>
-                  <input
-                    type="text"
-                    value={currentStepInput}
-                    onChange={(e) => setCurrentStepInput(e.target.value)}
-                    onKeyDown={handleStepInputKeyDown}
-                    placeholder="Enter a step and press Enter..."
-                    className="step-input"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddStep}
-                    className="btn-add-step"
-                  >
-                    Add
-                  </button>
+              <textarea
+                id="instructions"
+                value={formData.instructions}
+                onChange={(e) => handleChange('instructions', e.target.value)}
+                placeholder="Enter each step on a new line&#10;e.g.,&#10;Heat oil in a large pan over medium-high heat&#10;Add rice and stir-fry for 2-3 minutes&#10;Push rice to the side and scramble the eggs"
+                className="textarea"
+                rows={8}
+              />
+              <p className="field-hint">One step per line</p>
+
+              {formData.instructions && (
+                <div className="instructions-preview">
+                  <p className="instructions-preview-title">Preview:</p>
+                  <ol className="instructions-preview-list">
+                    {formData.instructions
+                      .split('\n')
+                      .filter(line => line.trim())
+                      .map((step, index) => (
+                        <li key={index}>{step.trim()}</li>
+                      ))}
+                  </ol>
                 </div>
-              </div>
-              <p className="field-hint">Press Enter or click Add to add each step</p>
+              )}
             </div>
 
             <div className="form-group">
